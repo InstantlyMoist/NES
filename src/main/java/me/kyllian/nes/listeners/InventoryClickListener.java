@@ -1,6 +1,6 @@
 package me.kyllian.nes.listeners;
 
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -11,9 +11,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class InventoryClickListener implements Listener {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    public InventoryClickListener(GameboyPlugin plugin) {
+    public InventoryClickListener(NESPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }

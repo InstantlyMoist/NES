@@ -1,13 +1,13 @@
 package me.kyllian.nes.handlers.map;
 
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import org.bukkit.Bukkit;
 
 public class MapHandlerFactory {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    public MapHandlerFactory(GameboyPlugin plugin) {
+    public MapHandlerFactory(NESPlugin plugin) {
         this.plugin = plugin;
     }
 

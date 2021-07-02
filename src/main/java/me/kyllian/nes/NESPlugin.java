@@ -1,6 +1,6 @@
 package me.kyllian.nes;
 
-import me.kyllian.nes.commands.GameboyExecutor;
+import me.kyllian.nes.commands.NesExecutor;
 import me.kyllian.nes.data.Pocket;
 import me.kyllian.nes.handlers.MessageHandler;
 import me.kyllian.nes.handlers.PlayerHandler;
@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameboyPlugin extends JavaPlugin {
+public class NESPlugin extends JavaPlugin {
 
     private int gamesEmulated = 0;
 
@@ -41,7 +41,7 @@ public class GameboyPlugin extends JavaPlugin {
         playerHandler = new PlayerHandler(this);
         romHandler = new RomHandler(this);
 
-        Metrics metrics = new Metrics(this, 9592);
+        Metrics metrics = new Metrics(this, 11908);
         metrics.addCustomChart(new Metrics.SingleLineChart("games_emulated", () ->
                 gamesEmulated));
         metrics.addCustomChart(new Metrics.AdvancedPie("games_installed", () -> {
@@ -55,7 +55,7 @@ public class GameboyPlugin extends JavaPlugin {
 
         mapHandler.loadData();
 
-        getCommand("gameboy").setExecutor(new GameboyExecutor(this));
+        getCommand("nes").setExecutor(new NesExecutor(this));
 
         new InventoryClickListener(this);
         new PlayerDropItemListener(this);

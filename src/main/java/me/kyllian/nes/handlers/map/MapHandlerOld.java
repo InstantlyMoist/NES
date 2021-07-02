@@ -1,6 +1,6 @@
 package me.kyllian.nes.handlers.map;
 
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
 import net.coobird.thumbnailator.makers.FixedSizeThumbnailMaker;
 import net.coobird.thumbnailator.resizers.DefaultResizerFactory;
@@ -27,14 +27,14 @@ import java.util.Map;
 
 public class MapHandlerOld implements MapHandler {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
     private File file;
     private FileConfiguration fileConfiguration;
 
     private Map<ItemStack, Boolean> mapsUsing;
 
-    public MapHandlerOld(GameboyPlugin plugin) {
+    public MapHandlerOld(NESPlugin plugin) {
         this.plugin = plugin;
         loadData();
     }
@@ -45,10 +45,10 @@ public class MapHandlerOld implements MapHandler {
         if (!file.exists()) plugin.saveResource("maps.yml", false);
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
         List<Integer> maps = fileConfiguration.getIntegerList("maps");
-        int mapAmount = plugin.getConfig().getInt("gameboys");
+        int mapAmount = plugin.getConfig().getInt("nes_amount");
         int currentMapAmount = maps.size();
         if (mapAmount > currentMapAmount) {
-            Bukkit.getLogger().info("Gameboy didn't find existing, predefined maps. Generating them, this may take some time...");
+            Bukkit.getLogger().info("NES didn't find existing, predefined maps. Generating them, this may take some time...");
             World world = Bukkit.getWorlds().get(0);
             for (int i = 0; i != mapAmount - currentMapAmount; i++) {
                 MapView mapView = Bukkit.createMap(world);
@@ -108,7 +108,7 @@ public class MapHandlerOld implements MapHandler {
                 if (pocket.getEmulator() == null) return;
                 try {
                     Resizer resizer = DefaultResizerFactory.getInstance().getResizer(new Dimension(160, 144), new Dimension(128, 128));
-                    BufferedImage scaled = new FixedSizeThumbnailMaker(128, 128, true, true).resizer(resizer).make(pocket.getEmulator().lcd.freeBufferFrame);
+                    BufferedImage scaled = new FixedSizeThumbnailMaker(128, 128, true, true).resizer(resizer).make(pocket.getEmulator().getFrame());
                     BufferedImage newImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
                     Graphics graphics = newImage.getGraphics();
                     graphics.setColor(Color.white);

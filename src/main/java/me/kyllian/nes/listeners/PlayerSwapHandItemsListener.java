@@ -1,7 +1,7 @@
 package me.kyllian.nes.listeners;
 
-import me.kyllian.nes.GameboyPlugin;
-import me.kyllian.nes.data.Button;
+import com.grapeshot.halfnes.ui.PuppetController;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,9 +11,9 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 public class PlayerSwapHandItemsListener implements Listener {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    public PlayerSwapHandItemsListener(GameboyPlugin plugin) {
+    public PlayerSwapHandItemsListener(NESPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -24,6 +24,6 @@ public class PlayerSwapHandItemsListener implements Listener {
         Pocket pocket = plugin.getPlayerHandler().getPocket(player);
         if (pocket.isEmpty()) return;
         event.setCancelled(true);
-        pocket.getButtonToggleHelper().press(Button.BUTTONSTART, true);
+        pocket.getButtonToggleHelper().press(PuppetController.Button.START, true);
     }
 }

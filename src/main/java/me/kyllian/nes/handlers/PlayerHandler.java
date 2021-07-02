@@ -1,8 +1,7 @@
 package me.kyllian.nes.handlers;
 
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
-import nitrous.Cartridge;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -11,21 +10,20 @@ import java.util.Map;
 
 public class PlayerHandler {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
     private Map<Player, Pocket> pockets;
 
-    public PlayerHandler(GameboyPlugin plugin) {
+    public PlayerHandler(NESPlugin plugin) {
         this.plugin = plugin;
 
         pockets =  new HashMap<>();
     }
 
-    public void loadGame(Player player, Cartridge cartridge) {
-        //TODO: First load animation (?)
+    public void loadGame(Player player, String path) {
         try {
             plugin.notifyEmulate();
-            getPocket(player).loadEmulator(plugin, cartridge, player);
+            getPocket(player).loadEmulator(plugin, player, path);
             plugin.getMapHandler().sendMap(player);
             if (plugin.isProtocolLib()) return;
             Location playerLocation = player.getLocation();

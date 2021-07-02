@@ -1,26 +1,19 @@
 package me.kyllian.nes.data;
 
 import com.grapeshot.halfnes.HeadlessNES;
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.helpers.ButtonToggleHelper;
-import nitrous.Cartridge;
-import nitrous.cpu.Emulator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 public class Pocket {
 
     private BukkitTask arrowDespawnHandler;
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
     private HeadlessNES emulator;
 
@@ -29,12 +22,12 @@ public class Pocket {
     private ItemStack handItem = null;
     private Entity arrow;
 
-    public void loadEmulator(GameboyPlugin plugin, Player player) {
+    public void loadEmulator(NESPlugin plugin, Player player, String path) { //TODO Add file path here
         this.plugin = plugin;
 
-        emulator = new HeadlessNES(plugin.getDataFolder() + "/game.nes");
+        emulator = new HeadlessNES(plugin, path);
 
-        //buttonToggleHelper = new ButtonToggleHelper(plugin, emulator);
+        buttonToggleHelper = new ButtonToggleHelper(plugin, emulator);
 
         handItem = player.getInventory().getItemInMainHand();
 
@@ -48,13 +41,7 @@ public class Pocket {
 
     public void stopEmulator(Player player) {
         if (plugin.isProtocolLib()) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    arrow.setTicksLived(10000);
-                    arrow.remove();
-                }
-            }.runTask(plugin);
+            arrow.remove();
         }
         arrow = null;
 

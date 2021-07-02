@@ -1,13 +1,13 @@
 package me.kyllian.nes.commands;
 
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import nitrous.Cartridge;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,11 +18,11 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 
-public class GameboyExecutor implements CommandExecutor {
+public class NesExecutor implements CommandExecutor {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    public GameboyExecutor(GameboyPlugin plugin) {
+    public NesExecutor(NESPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -59,7 +59,7 @@ public class GameboyExecutor implements CommandExecutor {
                     player.sendMessage(plugin.getMessageHandler().getMessage("already-running"));
                     return true;
                 }
-                if (!player.hasPermission("gameboy.play")) {
+                if (!player.hasPermission("nes.play")) {
                     player.sendMessage(plugin.getMessageHandler().getMessage("no-permission"));
                     return true;
                 }
@@ -67,9 +67,9 @@ public class GameboyExecutor implements CommandExecutor {
                 for (int i = 1; i != args.length; i++) {
                     gameName += args[i] + " ";
                 }
-                gameName = gameName.trim().toUpperCase();
-                Cartridge foundCartridge = plugin.getRomHandler().getRoms().get(gameName);
-                if (foundCartridge == null) {
+                gameName = gameName.trim();
+                String foundPath = plugin.getRomHandler().getRoms().get(gameName);
+                if (foundPath == null) {
                     sender.sendMessage(plugin.getMessageHandler().getMessage("not-found"));
                     showHelp(sender);
                     return true;
@@ -83,8 +83,8 @@ public class GameboyExecutor implements CommandExecutor {
 
                     pocket.setArrow(entity);
                 }
-                player.sendMessage(plugin.getMessageHandler().getMessage(plugin.isProtocolLib() ? "now-playing-protocollib" : "now-playing-normal").replace("%gamename%", foundCartridge.gameTitle));
-                plugin.getPlayerHandler().loadGame(player, foundCartridge);
+                player.sendMessage(plugin.getMessageHandler().getMessage(plugin.isProtocolLib() ? "now-playing-protocollib" : "now-playing-normal").replace("%gamename%", gameName));
+                plugin.getPlayerHandler().loadGame(player, foundPath);
                 return true;
             }
         }
@@ -100,7 +100,7 @@ public class GameboyExecutor implements CommandExecutor {
         }
         plugin.getRomHandler().getRoms().keySet().forEach(rom -> {
             TextComponent romClick = new TextComponent(colorTranslate("\n" + plugin.getMessageHandler().getMessage("gamename-prefix") + rom));
-            romClick.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/gameboy play " + rom));
+            romClick.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nes play " + rom));
             try {
                 romClick.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(plugin.getMessageHandler().getMessage("click-to-play").replace("%gamename%", rom))));
             } catch (NoClassDefFoundError ignored) {
@@ -110,7 +110,7 @@ public class GameboyExecutor implements CommandExecutor {
         });
         component.addExtra(plugin.getMessageHandler().getMessage("instructions"));
         sender.spigot().sendMessage(component);
-        }
+    }
 
     public String colorTranslate(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);

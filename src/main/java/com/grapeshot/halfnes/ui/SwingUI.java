@@ -52,9 +52,6 @@ public class SwingUI extends JFrame implements GUIInterface {
         screenScaleFactor = PrefsSingleton.get().getInt("screenScaling", 2);
         padController1 = new ControllerImpl(this, 0);
         padController2 = new ControllerImpl(this, 1);
-        nes.setControllers(padController1, padController2);
-        padController1.startEventQueue();
-        padController2.startEventQueue();
     }
 
     @Override
@@ -484,8 +481,6 @@ public class SwingUI extends JFrame implements GUIInterface {
         final ControlsDialog dialog = new ControlsDialog(this);
         dialog.setVisible(true);
         if (dialog.okClicked()) {
-            padController1.setButtons();
-            padController2.setButtons();
         }
     }
 
@@ -578,8 +573,6 @@ public class SwingUI extends JFrame implements GUIInterface {
         private void close() {
             dispose();
             savewindowposition();
-            padController1.stopEventQueue();
-            padController2.stopEventQueue();
             nes.quit();
         }
 

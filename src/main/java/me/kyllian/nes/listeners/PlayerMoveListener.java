@@ -1,9 +1,8 @@
 package me.kyllian.nes.listeners;
 
-import me.kyllian.nes.GameboyPlugin;
-import me.kyllian.nes.data.Button;
+import com.grapeshot.halfnes.ui.PuppetController;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
-import nitrous.cpu.Emulator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,9 +11,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerMoveListener implements Listener {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    public PlayerMoveListener(GameboyPlugin plugin) {
+    public PlayerMoveListener(NESPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -26,10 +25,10 @@ public class PlayerMoveListener implements Listener {
         if (pocket.isEmpty()) return;
         double diffX = event.getTo().getX() - event.getFrom().getX();
         double diffZ = event.getTo().getZ() - event.getFrom().getZ();
-        pocket.getButtonToggleHelper().press(Button.BUTTONLEFT, diffX > 0.01);
-        pocket.getButtonToggleHelper().press(Button.BUTTONRIGHT, diffX < -0.01);
-        pocket.getButtonToggleHelper().press(Button.BUTTONUP, diffZ > 0.01);
-        pocket.getButtonToggleHelper().press(Button.BUTTONDOWN, diffZ < -0.01);
+        pocket.getButtonToggleHelper().press(PuppetController.Button.LEFT, diffX > 0.01);
+        pocket.getButtonToggleHelper().press(PuppetController.Button.RIGHT, diffX < -0.01);
+        pocket.getButtonToggleHelper().press(PuppetController.Button.UP, diffZ > 0.01);
+        pocket.getButtonToggleHelper().press(PuppetController.Button.DOWN, diffZ < -0.01);
         event.setTo(event.getFrom());
     }
 

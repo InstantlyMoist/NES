@@ -1,15 +1,15 @@
 package me.kyllian.nes.tasks;
 
-import me.kyllian.nes.GameboyPlugin;
-import nitrous.cpu.Emulator;
+import com.grapeshot.halfnes.HeadlessNES;
+import me.kyllian.nes.NESPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class MovementStopper extends BukkitRunnable {
 
     private long lastUpdate;
-    private Emulator emulator;
+    private HeadlessNES emulator;
 
-    public MovementStopper(GameboyPlugin plugin, Emulator emulator) {
+    public MovementStopper(NESPlugin plugin, HeadlessNES emulator) {
         this.emulator = emulator;
         this.lastUpdate = System.currentTimeMillis();
         runTaskTimer(plugin, 5, 5);
@@ -18,10 +18,11 @@ public class MovementStopper extends BukkitRunnable {
     public void run() {
         if (emulator == null) cancel();
         if (System.currentTimeMillis() - lastUpdate > 100 && emulator != null) {
-            emulator.buttonUp = false;
+            //TODO: Reset the following buttons
+            /*emulator.buttonUp = false;
             emulator.buttonDown = false;
             emulator.buttonLeft = false;
-            emulator.buttonRight = false;
+            emulator.buttonRight = false;*/
         }
     }
 

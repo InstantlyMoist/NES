@@ -1,7 +1,7 @@
 package me.kyllian.nes.listeners;
 
-import me.kyllian.nes.GameboyPlugin;
-import me.kyllian.nes.data.Button;
+import com.grapeshot.halfnes.ui.PuppetController;
+import me.kyllian.nes.NESPlugin;
 import me.kyllian.nes.data.Pocket;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,9 +12,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerInteractListener implements Listener {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    public PlayerInteractListener(GameboyPlugin plugin) {
+    public PlayerInteractListener(NESPlugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -25,7 +25,7 @@ public class PlayerInteractListener implements Listener {
         Pocket pocket = plugin.getPlayerHandler().getPocket(player);
         if (pocket.isEmpty()) return;
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-            pocket.getButtonToggleHelper().press(Button.BUTTONB, true);
+            pocket.getButtonToggleHelper().press(PuppetController.Button.B, true);
         event.setCancelled(true);
     }
 }

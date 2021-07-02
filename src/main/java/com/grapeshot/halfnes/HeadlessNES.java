@@ -2,6 +2,9 @@ package com.grapeshot.halfnes;
 
 import com.grapeshot.halfnes.ui.HeadlessUI;
 import com.grapeshot.halfnes.ui.PuppetController;
+import me.kyllian.nes.NESPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,16 +19,26 @@ import java.nio.Buffer;
  */
 public class HeadlessNES {
 
-    private BufferedImage frame;
+    private HeadlessUI ui;
+
+    private BufferedImage frame = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
     private boolean running = true;
 
-    public HeadlessNES(String romPath)  {
-        HeadlessUI ui = new HeadlessUI(romPath,  true);
-
-        while (running) {
-            ui.runFrame();
-            frame = ui.getLastFrame();
-        }
+    public HeadlessNES(NESPlugin plugin, String romPath) {
+        ui = new HeadlessUI(romPath, true);
+        new BukkitRunnable() {
+            public void run() {
+                if (!running) {
+                    ui.getNes().quit();
+                    cancel();
+                    return;
+                }
+                while (running) {
+                    ui.runFrame();
+                    frame = ui.getLastFrame();
+                }
+            }
+        }.runTaskAsynchronously(plugin);
     }
 
     public void stop() {
@@ -34,5 +47,9 @@ public class HeadlessNES {
 
     public BufferedImage getFrame() {
         return frame;
+    }
+
+    public HeadlessUI getUi() {
+        return ui;
     }
 }

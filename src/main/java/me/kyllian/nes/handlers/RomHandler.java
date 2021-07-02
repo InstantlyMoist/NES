@@ -1,23 +1,21 @@
 package me.kyllian.nes.handlers;
 
-import me.kyllian.nes.GameboyPlugin;
-import nitrous.Cartridge;
+import me.kyllian.nes.NESPlugin;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RomHandler {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
-    private Map<String, Cartridge> roms;
+    private Map<String, String> roms;
     private File romFolder;
 
-    public RomHandler(GameboyPlugin plugin) {
+    public RomHandler(NESPlugin plugin) {
         this.plugin = plugin;
 
         romFolder = new File(plugin.getDataFolder(), "roms");
@@ -36,15 +34,14 @@ public class RomHandler {
         for (File rom : romFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return (name.endsWith(".gb") || name.endsWith(".gbc"));
+                return (name.endsWith(".nes"));
             }
         })) {
-            Cartridge cartridge = new Cartridge(Files.readAllBytes(rom.toPath()));
-            roms.put(roms.get(cartridge.gameTitle) != null ? cartridge.gameTitle + "_1" : cartridge.gameTitle, cartridge);
+            roms.put(rom.getName(), rom.toPath().toString());
         }
     }
 
-    public Map<String, Cartridge> getRoms() {
+    public Map<String, String> getRoms() {
         return roms;
     }
 }

@@ -1,6 +1,6 @@
 package me.kyllian.nes.handlers;
 
-import me.kyllian.nes.GameboyPlugin;
+import me.kyllian.nes.NESPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,13 +10,13 @@ import java.util.List;
 
 public class MessageHandler {
 
-    private GameboyPlugin plugin;
+    private NESPlugin plugin;
 
     private File file;
     private FileConfiguration fileConfiguration;
 
 
-    public MessageHandler(GameboyPlugin plugin) {
+    public MessageHandler(NESPlugin plugin) {
         this.plugin = plugin;
         file = new File(plugin.getDataFolder(), "messages.yml");
         if (!file.exists()) plugin.saveResource("messages.yml", false);
