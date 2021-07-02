@@ -1,0 +1,12 @@
+name: NES
+main: me.kyllian.nes.NES
+author: Kyllian
+version: ${project.version}
+api-version: 1.13
+softdepend:
+  - ProtocolLib
+
+commands:
+  nes:
+    usage: /<command>
+    description: Base command of the plugin

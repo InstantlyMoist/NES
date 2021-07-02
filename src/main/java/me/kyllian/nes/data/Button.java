@@ -1,0 +1,7 @@
+package me.kyllian.nes.data;
+
+public enum Button {
+
+    BUTTONLEFT, BUTTONRIGHT, BUTTONUP, BUTTONDOWN, BUTTONA, BUTTONB, BUTTONSTART, BUTTONSELECT
+
+}
