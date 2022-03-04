@@ -41,9 +41,15 @@ public class Pocket {
 
     public void stopEmulator(Player player) {
         if (plugin.isProtocolLib()) {
-            arrow.remove();
+            new BukkitRunnable() {
+                public void run() {
+                    try {
+                        arrow.remove();
+                        arrow = null;
+                    } catch (Exception e) {}
+                }
+            }.runTask(plugin);
         }
-        arrow = null;
 
         player.getInventory().setItemInMainHand(handItem);
         handItem = null;
