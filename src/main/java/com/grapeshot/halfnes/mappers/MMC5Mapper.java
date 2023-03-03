@@ -5,7 +5,7 @@
 package com.grapeshot.halfnes.mappers;
 
 import com.grapeshot.halfnes.utils;
-import com.grapeshot.halfnes.audio.MMC5SoundChip;
+
 import java.util.Arrays;
 
 /**
@@ -27,7 +27,6 @@ public class MMC5Mapper extends Mapper {
     private final boolean[] romHere = new boolean[3];
     private int scanctrLine, irqCounter = 20;
     private final int[] fillnt = new int[1024];
-    private MMC5SoundChip soundchip;
     private boolean inFrame = false;
 
     @Override
@@ -64,12 +63,9 @@ public class MMC5Mapper extends Mapper {
                 case 0x5010:
                 case 0x5011:
                 case 0x5015:
-                    if (soundchip == null) {
-                        soundchip = new MMC5SoundChip();
-                        cpuram.apu.addExpnSound(soundchip);
-                    }
+
                     //sound chip
-                    soundchip.write(addr - 0x5000, data);
+
                     break;
                 case 0x5100:
                     //prg mode select
@@ -277,9 +273,6 @@ public class MMC5Mapper extends Mapper {
             switch (addr) {
                 case 0x5015:
                     //sound status
-                    if (soundchip != null) {
-                        return soundchip.status();
-                    }
                     return addr >> 8;
                 case 0x5204:
                     //irq status

@@ -4,7 +4,6 @@
  */
 package com.grapeshot.halfnes.mappers;
 
-import com.grapeshot.halfnes.audio.*;
 import com.grapeshot.halfnes.utils;
 import java.util.Arrays;
 
@@ -17,7 +16,6 @@ public class NamcoMapper extends Mapper {
     private int soundAddr = 0;
     private boolean autoincrement = false, irqenable = false,
             interrupted = false, chrramenable0 = false, chrramenable1 = false;
-    Namco163SoundChip sound = new Namco163SoundChip();
     private boolean hasInitSound = false;
     private int irqcounter = 0x3fff;
     private int[] chrbanks = new int[8], chr_ram = new int[16384];
@@ -40,14 +38,14 @@ public class NamcoMapper extends Mapper {
         if (addr >= 0x4800 && addr < 0x5000) {
             //read sound ram
             if (!hasInitSound) {
-                cpuram.apu.addExpnSound((ExpansionSoundChip) sound);
+
                 hasInitSound = true;
             }
-            int retval = sound.read(soundAddr);
+
             if (autoincrement) {
                 soundAddr = ++soundAddr & 0x7f;
             }
-            return retval;
+
         } else if (addr < 0x5800) {
             irqack();
             return irqcounter & 0xff;
@@ -71,10 +69,10 @@ public class NamcoMapper extends Mapper {
         } else if (addr <= 0x4fff) {
             //write to sound chip
             if (!hasInitSound) {
-                cpuram.apu.addExpnSound((ExpansionSoundChip) sound);
+
                 hasInitSound = true;
             }
-            sound.write(soundAddr, data);
+
             if (autoincrement) {
                 soundAddr = ++soundAddr & 0x7f;
             }

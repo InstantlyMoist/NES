@@ -87,6 +87,36 @@ public class NesExecutor implements CommandExecutor {
                 plugin.getPlayerHandler().loadGame(player, foundPath);
                 return true;
             }
+//            if (args[0].equalsIgnoreCase("join")) {
+//                if (!pocket.isEmpty()) {
+//                    player.sendMessage(plugin.getMessageHandler().getMessage("already-running"));
+//                    return true;
+//                }
+//                if (!player.hasPermission("nes.play")) {
+//                    player.sendMessage(plugin.getMessageHandler().getMessage("no-permission"));
+//                    return true;
+//                }
+//                Player target = Bukkit.getPlayer(args[1]);
+//                if (target == null) {
+//                    player.sendMessage(plugin.getMessageHandler().getMessage("not-found"));
+//                    return true;
+//                }
+//                Pocket targetPocket = plugin.getPlayerHandler().getPocket(target);
+//                if (targetPocket.isEmpty()) {
+//                    player.sendMessage(plugin.getMessageHandler().getMessage("not-found"));
+//                    return true;
+//                }
+//                if (plugin.isProtocolLib()) {
+//                    Entity entity = player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.ARROW);
+//                    entity.addPassenger(player);
+//                    entity.setSilent(true);
+//                    entity.setInvulnerable(true);
+//                    entity.setGravity(false);
+//
+//                    targetPocket.setCompanionArrow(entity);
+//                }
+//                player.sendMessage("Now playing with " + target.getName());
+//            }
         }
         showHelp(sender);
         return true;

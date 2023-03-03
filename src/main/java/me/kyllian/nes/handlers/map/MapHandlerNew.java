@@ -17,6 +17,8 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -88,26 +90,39 @@ public class MapHandlerNew implements MapHandler {
         MapView mapView = mapMeta.getMapView();
         if (mapView.getRenderers() != null) mapView.getRenderers().clear();
 
-        mapView.addRenderer(new MapRenderer() {
-            Pocket pocket = plugin.getPlayerHandler().getPocket(player);
+        MapRenderer renderer = new MapRenderer() {
+            final Pocket pocket = plugin.getPlayerHandler().getPocket(player);
 
             @Override
-            public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-                if (pocket.getEmulator() == null) return;
-                try {
-                    Resizer resizer = DefaultResizerFactory.getInstance().getResizer(new Dimension(160, 144), new Dimension(128, 128));
-                    BufferedImage scaled = new FixedSizeThumbnailMaker(128, 128, true, true).resizer(resizer).make(pocket.getEmulator().getFrame());
-                    BufferedImage newImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-                    Graphics graphics = newImage.getGraphics();
-                    graphics.setColor(Color.white);
-                    graphics.fillRect(0, 0, 128, 128);
-                    graphics.drawImage(scaled, 0, 6, null);
-                    mapCanvas.drawImage(0, 0, newImage);
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+            public void render(@NonNull MapView mapView, @NonNull MapCanvas mapCanvas, @NonNull Player player) {
+                int height = pocket.getEmulator().freeBufferArrayByte.length / 128;
+
+                byte[] pixels = pocket.getEmulator().freeBufferArrayByte.clone();
+
+                for (int x = 0; x < 128; x++) {
+                    for (int y = 0; y < height; y++) {
+                        mapCanvas.setPixel(x, y, pixels[x + (y * 128)]);
+                    }
                 }
             }
-        });
+        };
+
+        mapView.addRenderer(renderer);
+
+        int tickDelay =  plugin.getConfig().getInt("tick_update_delay", 1);
+        new BukkitRunnable() {
+            final Pocket pocket = plugin.getPlayerHandler().getPocket(player);
+            @Override
+            public void run() {
+                if (pocket.getEmulator() == null) {
+                    mapView.removeRenderer(renderer);
+                    cancel();
+                    return;
+                }
+                player.sendMap(mapView);
+            }
+        }.runTaskTimer(plugin, tickDelay, tickDelay);
+
         map.setItemMeta(mapMeta);
         player.getInventory().setItemInMainHand(map);
     }

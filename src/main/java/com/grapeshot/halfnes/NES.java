@@ -12,6 +12,7 @@ import com.grapeshot.halfnes.ui.FrameLimiterImpl;
 import com.grapeshot.halfnes.ui.FrameLimiterInterface;
 import com.grapeshot.halfnes.ui.GUIInterface;
 import main.java.com.grapeshot.halfnes.ProjectInfo;
+import org.bukkit.Bukkit;
 
 public class NES implements ProjectInfo {
 
@@ -23,12 +24,11 @@ public class NES implements ProjectInfo {
     private GUIInterface gui;
     private ControllerInterface controller1, controller2;
     public boolean runEmulation = false;
-    private boolean dontSleep = false;
     private boolean shutdown = false;
     public long frameStartTime, framecount, frameDoneTime;
     private boolean frameLimiterOn = true;
     private String curRomPath, curRomName;
-    private final FrameLimiterInterface limiter = new FrameLimiterImpl(this, 16639267);
+    //private final FrameLimiterInterface limiter = new FrameLimiterImpl(this, 16639267);
     // Pro Action Replay device
     private ActionReplay actionReplay;
 
@@ -58,20 +58,20 @@ public class NES implements ProjectInfo {
 
     public void run() {
         while (!shutdown) {
-            if (runEmulation) {
-                frameStartTime = System.nanoTime();
-                actionReplay.applyPatches();
-                runframe();
-                if (frameLimiterOn && !dontSleep) {
-                    limiter.sleep();
-                }
-                frameDoneTime = System.nanoTime() - frameStartTime;
-            } else {
-                limiter.sleepFixed();
-                if (ppu != null && framecount > 1) {
-                    gui.render();
-                }
-            }
+//            if (runEmulation) {
+//                frameStartTime = System.nanoTime();
+//                actionReplay.applyPatches();
+//                runframe();
+//                if (frameLimiterOn) {
+//                    limiter.sleep();
+//                }
+//                frameDoneTime = System.nanoTime() - frameStartTime;
+//            } else {
+//                limiter.sleepFixed();
+//                if (ppu != null && framecount > 1) {
+//                    gui.render();
+//                }
+//            }
         }
     }
 
@@ -80,7 +80,6 @@ public class NES implements ProjectInfo {
         ppu.runFrame();
 
         //do end of frame stuff
-        dontSleep = apu.bufferHasLessThan(1000);
         //if the audio buffer is completely drained, don't sleep for this frame
         //this is to prevent the emulator from getting stuck sleeping too much
         //on a slow system or when the audio buffer runs dry.
@@ -139,7 +138,6 @@ public class NES implements ProjectInfo {
             }
             if (apu != null) {
                 //if rom already running save its sram before closing
-                apu.destroy();
                 saveSRAM(false);
                 //also get rid of mapper etc.
                 mapper.destroy();
@@ -211,8 +209,6 @@ public class NES implements ProjectInfo {
             mapper.reset();
             cpu.reset();
             runEmulation = true;
-            apu.pause();
-            apu.resume();
         }
         //reset frame counter as well because PPU is reset
         //on Famicom, PPU is not reset when Reset is pressed
@@ -226,7 +222,6 @@ public class NES implements ProjectInfo {
 
     public synchronized void pause() {
         if (apu != null) {
-            apu.pause();
         }
         runEmulation = false;
     }
@@ -251,7 +246,6 @@ public class NES implements ProjectInfo {
 
     public synchronized void resume() {
         if (apu != null) {
-            apu.resume();
         }
         if (cpu != null) {
             runEmulation = true;
@@ -287,17 +281,17 @@ public class NES implements ProjectInfo {
         if (ppu != null) {
             ppu.setParameters();
         }
-        if (limiter != null && mapper != null) {
-            switch (mapper.getTVType()) {
-                case NTSC:
-                default:
-                    limiter.setInterval(16639267);
-                    break;
-                case PAL:
-                case DENDY:
-                    limiter.setInterval(19997200);
-            }
-        }
+//        if (limiter != null && mapper != null) {
+//            switch (mapper.getTVType()) {
+//                case NTSC:
+//                default:
+//                    limiter.setInterval(16639267);
+//                    break;
+//                case PAL:
+//                case DENDY:
+//                    limiter.setInterval(19997200);
+//            }
+//        }
     }
 
     /**

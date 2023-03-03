@@ -6,7 +6,7 @@
 
     <groupId>me.kyllian.nes</groupId>
     <artifactId>NES</artifactId>
-    <version>1.01</version>
+    <version>1.07</version>
 
 
     <packaging>jar</packaging>
@@ -39,6 +39,16 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>javadoc/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

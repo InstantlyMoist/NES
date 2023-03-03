@@ -11,14 +11,12 @@ import java.util.Map;
 
 public class ButtonToggleHelper extends BukkitRunnable {
 
-    private NESPlugin plugin;
-    private HeadlessNES emulator;
+    private final HeadlessNES emulator;
 
-    private Map<PuppetController.Button, Long> buttonLastPressTimes;
-    private int buttonDebounce;
+    private final Map<PuppetController.Button, Long> buttonLastPressTimes;
+    private final int buttonDebounce;
 
     public ButtonToggleHelper(NESPlugin plugin, HeadlessNES emulator) {
-        this.plugin = plugin;
         this.emulator = emulator;
         buttonLastPressTimes = new HashMap<>();
 
@@ -30,9 +28,9 @@ public class ButtonToggleHelper extends BukkitRunnable {
     public void press(PuppetController.Button button, Boolean state) {
         if (state) buttonLastPressTimes.put(button, System.currentTimeMillis());
         emulator.getUi().getController1().pressButton(PuppetController.Button.START);
-        //TODO: Add new button system
-       if (state) emulator.getUi().getController1().pressButton(button);
-       else emulator.getUi().getController1().releaseButton(button);
+
+        if (state) emulator.getUi().getController1().pressButton(button);
+        else emulator.getUi().getController1().releaseButton(button);
     }
 
     @Override

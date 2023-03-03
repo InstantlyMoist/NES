@@ -21,6 +21,8 @@ public class Pocket {
 
     private ItemStack handItem = null;
     private Entity arrow;
+    private Entity companionArrow;
+    private Player companion;
 
     public void loadEmulator(NESPlugin plugin, Player player, String path) { //TODO Add file path here
         this.plugin = plugin;
@@ -41,14 +43,17 @@ public class Pocket {
 
     public void stopEmulator(Player player) {
         if (plugin.isProtocolLib()) {
-            new BukkitRunnable() {
-                public void run() {
-                    try {
-                        arrow.remove();
-                        arrow = null;
-                    } catch (Exception e) {}
-                }
-            }.runTask(plugin);
+           try {
+               new BukkitRunnable() {
+                   public void run() {
+                       arrow.remove();
+                       arrow = null;
+                   }
+               }.runTask(plugin);
+           } catch (Exception exception) {
+               arrow.remove();
+               arrow = null;
+           }
         }
 
         player.getInventory().setItemInMainHand(handItem);
@@ -76,11 +81,11 @@ public class Pocket {
         return buttonToggleHelper;
     }
 
-    public Entity getArrow() {
-        return arrow;
-    }
-
     public void setArrow(Entity arrow) {
         this.arrow = arrow;
+    }
+
+    public void setCompanionArrow(Entity companionArrow) {
+        this.companionArrow = companionArrow;
     }
 }

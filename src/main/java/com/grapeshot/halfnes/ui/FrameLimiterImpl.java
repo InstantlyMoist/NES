@@ -4,8 +4,10 @@
  */
 package com.grapeshot.halfnes.ui;
 
+import com.grapeshot.halfnes.HeadlessNES;
 import com.grapeshot.halfnes.NES;
 import com.grapeshot.halfnes.PrefsSingleton;
+import jdk.javadoc.internal.doclets.formats.html.markup.Head;
 
 /**
  *
@@ -13,11 +15,11 @@ import com.grapeshot.halfnes.PrefsSingleton;
  */
 public class FrameLimiterImpl implements FrameLimiterInterface {
 
-    NES nes;
+    HeadlessNES nes;
     private long sleepingtest = 0;
     public long FRAME_NS;
 
-    public FrameLimiterImpl(NES nes, long framens) {
+    public FrameLimiterImpl(HeadlessNES nes, long framens) {
         this.nes = nes;
         FRAME_NS = framens;
         //forceHighResolutionTimer();
@@ -33,7 +35,7 @@ public class FrameLimiterImpl implements FrameLimiterInterface {
         if (!PrefsSingleton.get().getBoolean("Sleep", true)) {
             return; //skip frame limiter if pref set
         }
-        final long timeleft = System.nanoTime() - nes.frameStartTime;
+        final long timeleft = System.nanoTime() - 1;
         if (timeleft < FRAME_NS) {
             final long sleepytime = (FRAME_NS - timeleft + sleepingtest);
             if (sleepytime < 0) {

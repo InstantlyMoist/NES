@@ -30,7 +30,6 @@ public class SteerVehicleListener {
                 if (container.getBooleans().read(1)) {
                     pocket.stopEmulator(player);
                     player.sendMessage(NESPlugin.getMessageHandler().getMessage("stopped"));
-                    return;
                 }
             }
         });

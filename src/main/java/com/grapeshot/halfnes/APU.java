@@ -5,15 +5,12 @@
 package com.grapeshot.halfnes;
 
 import com.grapeshot.halfnes.ui.Oscilloscope;
-import com.grapeshot.halfnes.audio.*;
 import com.grapeshot.halfnes.mappers.Mapper;
 import java.util.ArrayList;
 
 public class APU {
 
     public int samplerate;
-    private final Timer[] timers = {new SquareTimer(8, 2), new SquareTimer(8, 2),
-        new TriangleTimer(), new NoiseTimer()};
     private double cyclespersample;
     public final NES nes;
     CPU cpu;
@@ -23,7 +20,7 @@ public class APU {
     private int[] noiseperiod;
     // different for PAL
     private long accum = 0;
-    private final ArrayList<ExpansionSoundChip> expnSound = new ArrayList<>();
+
     private boolean soundFiltering;
     private final static int[] TNDLOOKUP = initTndLookup(), SQUARELOOKUP = initSquareLookup();
     private int framectrreload;
@@ -63,7 +60,6 @@ public class APU {
             sweepreload = {false, false};
     private final int[] sweepperiod = {15, 15}, sweepshift = {0, 0}, sweeppos = {0, 0};
     private int cyclesperframe;
-    private AudioOutInterface ai;
 
     public APU(final NES nes, final CPU cpu, final CPURAM cpuram) {
         this.samplerate = 1; //just in case we can't init audio
@@ -95,13 +91,7 @@ public class APU {
         Mapper.TVType tvtype = cpuram.mapper.getTVType();
         soundFiltering = PrefsSingleton.get().getBoolean("soundFiltering", true);
         samplerate = PrefsSingleton.get().getInt("sampleRate", 44100);
-        if (ai != null) {
-            ai.destroy();
-        }
-        ai = new SwingAudioImpl(nes, samplerate, tvtype);
-        if (PrefsSingleton.get().getBoolean("showScope", false)) {
-            ai = new Oscilloscope(ai);
-        }
+
         //pick the appropriate pitches and lengths for NTSC or PAL
         switch (tvtype) {
             case NTSC:
@@ -134,9 +124,6 @@ public class APU {
 //       ai = new Reverberator(ai, 20382,0.2,0.3,0.9);
     }
 
-    public boolean bufferHasLessThan(int samples) {
-        return ai.bufferHasLessThan(samples);
-    }
 
     public final int read(final int addr) {
         updateto((int) cpu.clocks);
@@ -177,21 +164,6 @@ public class APU {
         {1, 0, 0, 1, 1, 1, 1, 1}
     };
 
-    public void addExpnSound(ExpansionSoundChip chip) {
-        expnSound.add(chip);
-    }
-
-    public void destroy() {
-        ai.destroy();
-    }
-
-    public void pause() {
-        ai.pause();
-    }
-
-    public void resume() {
-        ai.resume();
-    }
 
     public final void write(final int reg, final int data) {
         //This is how values written to any of the APU's memory
@@ -203,7 +175,6 @@ public class APU {
                 //length counter 1 halt
                 lenctrHalt[0] = ((data & (utils.BIT5)) != 0);
                 // pulse 1 duty cycle
-                timers[0].setduty(DUTYLOOKUP[data >> 6]);
                 // and envelope
                 envConstVolume[0] = ((data & (utils.BIT4)) != 0);
                 envelopeValue[0] = data & 15;
@@ -223,16 +194,13 @@ public class APU {
                 break;
             case 0x2:
                 // pulse 1 timer low bit
-                timers[0].setperiod((timers[0].getperiod() & 0xfe00) + (data << 1));
                 break;
             case 0x3:
                 // length counter load, timer 1 high bits
                 if (lenCtrEnable[0]) {
                     lengthctr[0] = lenctrload[data >> 3];
                 }
-                timers[0].setperiod((timers[0].getperiod() & 0x1ff) + ((data & 7) << 9));
                 // sequencer restarted
-                timers[0].reset();
                 //envelope also restarted
                 envelopeStartFlag[0] = true;
                 break;
@@ -240,7 +208,6 @@ public class APU {
                 //length counter 2 halt
                 lenctrHalt[1] = ((data & (utils.BIT5)) != 0);
                 // pulse 2 duty cycle
-                timers[1].setduty(DUTYLOOKUP[data >> 6]);
                 // and envelope
                 envConstVolume[1] = ((data & (utils.BIT4)) != 0);
                 envelopeValue[1] = data & 15;
@@ -260,15 +227,12 @@ public class APU {
                 break;
             case 0x6:
                 // pulse 2 timer low bit
-                timers[1].setperiod((timers[1].getperiod() & 0xfe00) + (data << 1));
                 break;
             case 0x7:
                 if (lenCtrEnable[1]) {
                     lengthctr[1] = lenctrload[data >> 3];
                 }
-                timers[1].setperiod((timers[1].getperiod() & 0x1ff) + ((data & 7) << 9));
                 // sequencer restarted
-                timers[1].reset();
                 //envelope also restarted
                 envelopeStartFlag[1] = true;
                 break;
@@ -282,7 +246,6 @@ public class APU {
                 break;
             case 0xA:
                 // triangle low bits of timer
-                timers[2].setperiod((((timers[2].getperiod() * 1) & 0xff00) + data));
                 break;
             case 0xB:
                 // triangle length counter load
@@ -290,7 +253,6 @@ public class APU {
                 if (lenCtrEnable[2]) {
                     lengthctr[2] = lenctrload[data >> 3];
                 }
-                timers[2].setperiod((((timers[2].getperiod() * 1) & 0xff) + ((data & 7) << 8)));
                 linctrflag = true;
                 break;
             case 0xC:
@@ -303,8 +265,6 @@ public class APU {
             case 0xD:
                 break;
             case 0xE:
-                timers[3].setduty(((data & (utils.BIT7)) != 0) ? 6 : 1);
-                timers[3].setperiod(noiseperiod[data & 15]);
                 break;
             case 0xF:
                 //noise length counter load, envelope restart
@@ -387,7 +347,6 @@ public class APU {
                     setenvelope();
                     setlinctr();
                     setlength();
-                    setsweep();
                 }
                 break;
             default:
@@ -410,22 +369,9 @@ public class APU {
                     framectrdiv = framectrreload;
                     clockframecounter();
                 }
-                timers[0].clock();
-                timers[1].clock();
-                if (lengthctr[2] > 0 && linearctr > 0) {
-                    timers[2].clock();
-                }
-                timers[3].clock();
-                if (!expnSound.isEmpty()) {
-                    for (ExpansionSoundChip c : expnSound) {
-                        c.clock(1);
-                    }
-                }
-                accum += getOutputLevel();
 
                 if ((apucycle % cyclespersample) < 1) {
                     //not quite right - there's a non-integer # cycles per sample.
-                    ai.outputSample(lowpass_filter(highpass_filter((int) (accum / remainder))));
                     remainder = 0;
                     accum = 0;
                 }
@@ -442,40 +388,13 @@ public class APU {
                 }
                 if ((apucycle % cyclespersample) < 1) {
                     //not quite right - there's a non-integer # cycles per sample.
-                    timers[0].clock(remainder);
-                    timers[1].clock(remainder);
-                    if (lengthctr[2] > 0 && linearctr > 0) {
-                        timers[2].clock(remainder);
-                    }
-                    timers[3].clock(remainder);
-                    int mixvol = getOutputLevel();
-                    if (!expnSound.isEmpty()) {
-                        for (ExpansionSoundChip c : expnSound) {
-                            c.clock(remainder);
-                        }
-                    }
+
                     remainder = 0;
-                    ai.outputSample(lowpass_filter(highpass_filter(mixvol)));
+
                 }
                 ++apucycle;
             }
         }
-    }
-
-    private int getOutputLevel() {
-        int vol;
-        vol = SQUARELOOKUP[volume[0] * timers[0].getval()
-                + volume[1] * timers[1].getval()];
-        vol += TNDLOOKUP[3 * timers[2].getval()
-                + 2 * volume[3] * timers[3].getval()
-                + dmcvalue];
-        if (!expnSound.isEmpty()) {
-            vol *= 0.8;
-            for (ExpansionSoundChip c : expnSound) {
-                vol += c.getval();
-            }
-        }
-        return vol; //as usual, lack of unsigned types causes unending pain.
     }
 
     private int highpass_filter(int sample) {
@@ -493,7 +412,6 @@ public class APU {
     public final void finishframe() {
         updateto(cyclesperframe);
         apucycle = 0;
-        ai.flushFrame(nes.isFrameLimiterOn());
     }
 
     private void clockframecounter() {
@@ -511,7 +429,6 @@ public class APU {
         if ((ctrmode == 4 && (framectr == 1 || framectr == 3))
                 || (ctrmode == 5 && (framectr == 1 || framectr == 4))) {
             setlength();
-            setsweep();
         }
         if (!apuintflag && (framectr == 3) && (ctrmode == 4) && !statusframeint) {
             ++cpu.interrupt;
@@ -638,34 +555,6 @@ public class APU {
                 } else if (lenctrHalt[i] && envelopeCounter[i] <= 0) {
                     envelopeCounter[i] = 15;
                 }
-            }
-        }
-    }
-
-    private void setsweep() {
-        //System.err.println("sweep");
-        for (int i = 0; i < 2; ++i) {
-            sweepsilence[i] = false;
-            if (sweepreload[i]) {
-                sweepreload[i] = false;
-                sweeppos[i] = sweepperiod[i];
-            }
-            ++sweeppos[i];
-            final int rawperiod = (timers[i].getperiod() >> 1);
-            int shiftedperiod = (rawperiod >> sweepshift[i]);
-            if (sweepnegate[i]) {
-                //invert bits of period
-                //add 1 on second channel only
-                shiftedperiod = -shiftedperiod + i;
-            }
-            shiftedperiod += rawperiod;
-            if ((rawperiod < 8) || shiftedperiod > 0x7ff) {
-                // silence channel
-                sweepsilence[i] = true;
-            } else if (sweepenable[i] && (sweepshift[i] != 0) && lengthctr[i] > 0
-                    && sweeppos[i] > sweepperiod[i]) {
-                sweeppos[i] = 0;
-                timers[i].setperiod(shiftedperiod << 1);
             }
         }
     }

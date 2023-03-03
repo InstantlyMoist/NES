@@ -5,7 +5,6 @@
 package com.grapeshot.halfnes.mappers;
 
 import com.grapeshot.halfnes.*;
-import com.grapeshot.halfnes.audio.*;
 
 public class VRC6Mapper extends Mapper {
 
@@ -15,12 +14,12 @@ public class VRC6Mapper extends Mapper {
     int[] chrbank = {0, 0, 0, 0, 0, 0, 0, 0};
     boolean irqmode, irqenable, irqack, firedinterrupt = false;
     int irqreload, irqcounter = 22;
-    VRC6SoundChip sndchip;
+
     boolean hasInitSound = false;
 
     public VRC6Mapper(int mappernum) {
         super();
-        sndchip = new VRC6SoundChip();
+
 
         switch (mappernum) {
             //vrc6 has 2 different mapper numbers, for 2 different ways to assign the registers
@@ -66,8 +65,7 @@ public class VRC6Mapper extends Mapper {
             case 0x9:
             case 0xa:
                 //sound registers here
-                sndchip.write((addr & 0xf000) + (bit1 ? 2 : 0) + (bit0 ? 1 : 0), data);
-                break;
+
             case 0xc:
                 //c000-c003: prg bank 1 select
                 prgbank1 = data;
@@ -92,7 +90,7 @@ public class VRC6Mapper extends Mapper {
                     }
                 } else {
                     //expansion sound register here as well
-                    sndchip.write((addr & 0xf000) + (bit1 ? 2 : 0) + (bit0 ? 1 : 0), data);
+
                 }
                 break;
             case 0xd:
@@ -186,7 +184,7 @@ public class VRC6Mapper extends Mapper {
         if (!hasInitSound) {
             //tiny hack, because the APU is not initialized until AFTER this happens
             //TODO: this really should not need to be here.
-            cpuram.apu.addExpnSound(sndchip);
+
             hasInitSound = true;
         }
         if (irqenable) {

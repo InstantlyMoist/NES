@@ -5,7 +5,7 @@
 package com.grapeshot.halfnes.mappers;
 
 import com.grapeshot.halfnes.*;
-import com.grapeshot.halfnes.audio.*;
+
 
 public class VRC7Mapper extends Mapper {
     //need to add extra audio still.
@@ -15,7 +15,6 @@ public class VRC7Mapper extends Mapper {
     boolean irqmode, irqenable, irqack, firedinterrupt = false;
     int irqreload, irqcounter = 22;
     int regaddr = 0;
-    ExpansionSoundChip sndchip = new VRC7SoundChip();
     boolean hasInitSound = false;
     
     @Override
@@ -60,10 +59,10 @@ public class VRC7Mapper extends Mapper {
                     if (!hasInitSound) {
                         //tiny hack, because the APU is not initialized until AFTER this happens
                         //TODO: this really should not need to be here.
-                        cpuram.apu.addExpnSound(sndchip);
+
                         hasInitSound = true;
                     }
-                    sndchip.write(regaddr, data);
+
                 } else {
                     //$9010: sndchip register select
                     regaddr = data;

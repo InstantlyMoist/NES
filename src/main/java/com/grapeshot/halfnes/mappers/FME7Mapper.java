@@ -5,8 +5,6 @@
 package com.grapeshot.halfnes.mappers;
 
 import com.grapeshot.halfnes.utils;
-import com.grapeshot.halfnes.*;
-import com.grapeshot.halfnes.audio.*;
 
 /**
  *
@@ -24,7 +22,7 @@ public class FME7Mapper extends Mapper {
     private boolean irqenabled;
     private boolean irqclock;
     private boolean hasInitSound = false;
-    private final ExpansionSoundChip sndchip = new Sunsoft5BSoundChip();
+
     private boolean interrupted = false;
 
     public void loadrom() throws BadMapperException {
@@ -74,8 +72,7 @@ public class FME7Mapper extends Mapper {
             soundCommand = data & 0xf;
             if (!hasInitSound) {
                 //only initialize the sound chip if anything writes a sound command.
-                cpuram.apu.addExpnSound(sndchip);
-                hasInitSound = true;
+
             }
         } else if (addr == 0xa000) {
             //mapper data register
@@ -145,7 +142,7 @@ public class FME7Mapper extends Mapper {
                     break;
             }
         } else if (addr == 0xe000) {
-            sndchip.write(soundCommand, data);
+
         }
 
     }

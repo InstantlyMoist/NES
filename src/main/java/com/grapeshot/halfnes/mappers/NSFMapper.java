@@ -5,7 +5,6 @@
 package com.grapeshot.halfnes.mappers;
 
 import com.grapeshot.halfnes.*;
-import com.grapeshot.halfnes.audio.*;
 import java.util.Arrays;
 
 /**
@@ -27,13 +26,7 @@ public class NSFMapper extends Mapper {
     private int mmc5multiplier1, mmc5multiplier2;
     private int vrc7regaddr = 0;
     private int s5bSoundCommand = 0;
-    private Namco163SoundChip n163Audio;
-    private VRC6SoundChip vrc6Audio;
-    private VRC7SoundChip vrc7Audio;
-    private Sunsoft5BSoundChip s5bAudio;
-    private MMC5SoundChip mmc5Audio;
     private static final String trackstr = "Track --- / ---          <-B A->";
-    private FDSSoundChip fdsAudio;
 
     @Override
     public void loadrom() throws BadMapperException {
@@ -164,7 +157,7 @@ public class NSFMapper extends Mapper {
         }
 
         if (!hasInitSound) {
-            setSoundChip();
+
             hasInitSound = true;
         }
         if (!fds) { //DON'T CLEAR THIS WHEN STUFF LOADS HERE
@@ -188,24 +181,24 @@ public class NSFMapper extends Mapper {
             n163autoincrement = ((data & (utils.BIT7)) != 0);
             n163soundAddr = data & 0x7f;
         } else if (n163 && addr == 0x4800) {
-            n163Audio.write(n163soundAddr, data);
+
             if (n163autoincrement) {
                 n163soundAddr = ++n163soundAddr & 0x7f;
             }
         } else if (s5b && addr == 0xE000) {
-            s5bAudio.write(s5bSoundCommand, data);
+
         } else if (s5b && addr == 0xC000) {
             s5bSoundCommand = data & 0xF;
         } else if (vrc6 && addr >= 0xB000 && addr <= 0xB002) {
-            vrc6Audio.write((addr & 0xf000) + (addr & 3), data);
+
         } else if (vrc6 && addr >= 0xA000 && addr <= 0xA002) {
-            vrc6Audio.write((addr & 0xf000) + (addr & 3), data);
+
         } else if (vrc7 && addr == 0x9030) {
-            vrc7Audio.write(vrc7regaddr, data);
+
         } else if (vrc7 && addr == 0x9010) {
             vrc7regaddr = data;
         } else if (vrc6 && addr >= 0x9000 && addr <= 0x9002) {
-            vrc6Audio.write((addr & 0xf000) + (addr & 3), data);
+
         } else if (fds && nsfBanking && addr >= 0x6000) {
             if (addr < 0x8000) {
                 int fuuu = prg_map[((addr - 0x6000) >> 10) + 32] + (addr & 1023);
@@ -243,9 +236,9 @@ public class NSFMapper extends Mapper {
         } else if (mmc5 && (addr == 0x5205)) {
             mmc5multiplier1 = data;
         } else if (mmc5 && (addr >= 0x5000) && (addr <= 0x5015)) {
-            mmc5Audio.write(addr - 0x5000, data);
+
         } else if (fds && (addr >= 0x4040) && (addr <= 0x4092)) {
-            fdsAudio.write(addr, data);
+
         } else {
             //System.err.println("write to " + utils.hex(addr) + " goes nowhere");
         }
@@ -293,16 +286,16 @@ public class NSFMapper extends Mapper {
         } else if (mmc5 && addr == 0x5205) {
             return (mmc5multiplier1 * mmc5multiplier2) & 0xff;
         } else if (mmc5 && addr == 0x5015) {
-            return mmc5Audio.status();
+
         } else if (n163 && addr == 0x4800) {
             //System.err.println("readback");
-            int retval = n163Audio.read(n163soundAddr);
+
             if (n163autoincrement) {
                 n163soundAddr = ++n163soundAddr & 0x7f;
             }
-            return retval;
+
         } else if (fds && (addr >= 0x4040) && (addr < 0x4093)) {
-            return fdsAudio.read(addr);
+
         }
         //System.err.println("reading open bus " + utils.hex(addr));
         return addr >> 8; //open bus
@@ -437,45 +430,6 @@ public class NSFMapper extends Mapper {
         }
         //utils.printarray(prg_map);
         //utils.printarray(nsfStartBanks);
-    }
-
-    private void setSoundChip() {
-        if (((sndchip & (utils.BIT0)) != 0)) {
-            //VRC6 audio
-            vrc6 = true;
-            vrc6Audio = new VRC6SoundChip();
-            cpuram.apu.addExpnSound(vrc6Audio);
-        }
-        if (((sndchip & (utils.BIT1)) != 0)) {
-            //VRC7 audio
-            vrc7 = true;
-            vrc7Audio = new VRC7SoundChip();
-            cpuram.apu.addExpnSound(vrc7Audio);
-        }
-        if (((sndchip & (utils.BIT2)) != 0)) {
-            //FDS audio, not yet implemented
-            fds = true;
-            fdsAudio = new FDSSoundChip();
-            cpuram.apu.addExpnSound(fdsAudio);
-        }
-        if (((sndchip & (utils.BIT3)) != 0)) {
-            //MMC5 audio
-            mmc5 = true;
-            mmc5Audio = new MMC5SoundChip();
-            cpuram.apu.addExpnSound(mmc5Audio);
-        }
-        if (((sndchip & (utils.BIT4)) != 0)) {
-            //Namco 163 audio
-            n163 = true;
-            n163Audio = new Namco163SoundChip();
-            cpuram.apu.addExpnSound(n163Audio);
-        }
-        if (((sndchip & (utils.BIT5)) != 0)) {
-            //Sunsoft 5B audio
-            s5b = true;
-            s5bAudio = new Sunsoft5BSoundChip();
-            cpuram.apu.addExpnSound(s5bAudio);
-        }
     }
 
     private void writeTracks() {
