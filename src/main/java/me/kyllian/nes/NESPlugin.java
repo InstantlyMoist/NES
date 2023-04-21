@@ -1,5 +1,8 @@
 package me.kyllian.nes;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import me.kyllian.nes.commands.NesExecutor;
 import me.kyllian.nes.data.Pocket;
 import me.kyllian.nes.handlers.MessageHandler;
@@ -19,19 +22,27 @@ import java.util.Map;
 public class NESPlugin extends JavaPlugin {
 
     private int gamesEmulated = 0;
-
-    private boolean protocolLib;
-
     private MapHandler mapHandler;
     private MessageHandler messageHandler;
     private PlayerHandler playerHandler;
     private RomHandler romHandler;
 
+
+    @Override
+    public void onLoad() {
+        PacketEventsSettings settings = new PacketEventsSettings();
+        settings.bStats(false);
+        PacketEvents.setAPI(
+                SpigotPacketEventsBuilder.build(
+                        this,
+                        settings
+                )
+        );
+    }
+
     @Override
     public void onEnable() {
         super.onEnable();
-
-        protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -62,11 +73,9 @@ public class NESPlugin extends JavaPlugin {
         new PlayerInteractEntityListener(this);
         new PlayerInteractListener(this);
         new PlayerItemHeldListener(this);
-        if (!protocolLib) new PlayerMoveListener(this);
         new PlayerQuitListener(this);
         new PlayerSwapHandItemsListener(this);
-
-        if (protocolLib) new SteerVehicleListener(this);
+        PacketEvents.getAPI().getEventManager().registerListener(new SteerVehicleListener(this));
     }
 
     @Override
@@ -99,7 +108,4 @@ public class NESPlugin extends JavaPlugin {
         gamesEmulated++;
     }
 
-    public boolean isProtocolLib() {
-        return protocolLib;
-    }
 }

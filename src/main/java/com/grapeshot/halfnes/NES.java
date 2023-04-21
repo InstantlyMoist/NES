@@ -11,7 +11,7 @@ import com.grapeshot.halfnes.ui.ControllerInterface;
 import com.grapeshot.halfnes.ui.FrameLimiterImpl;
 import com.grapeshot.halfnes.ui.FrameLimiterInterface;
 import com.grapeshot.halfnes.ui.GUIInterface;
-import main.java.com.grapeshot.halfnes.ProjectInfo;
+import com.grapeshot.halfnes.ProjectInfo;
 import org.bukkit.Bukkit;
 
 public class NES implements ProjectInfo {

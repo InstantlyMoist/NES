@@ -3,8 +3,6 @@ main: me.kyllian.nes.NESPlugin
 author: Kyllian
 version: ${project.version}
 api-version: 1.13
-softdepend:
-  - ProtocolLib
 
 commands:
   nes:
