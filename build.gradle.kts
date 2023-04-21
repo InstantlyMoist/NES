@@ -27,5 +27,9 @@ tasks {
     shadowJar {
         archiveClassifier.set("")
         archiveFileName.set("NES-${project.version}.jar")
+        relocate("org.bstats", "me.instantlymoist.NES.bstats")
+        relocate("net.coobird", "me.instantlymoist.NES.coobird")
+        relocate("com.github.retrooper.packetevents", "me.instantlymoist.NES.retrooper")
+        relocate("io.github.retrooper.packetevents", "me.instantlymoist.NES.retrooper")
     }
 }
