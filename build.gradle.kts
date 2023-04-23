@@ -33,3 +33,14 @@ tasks {
         relocate("io.github.retrooper.packetevents", "me.instantlymoist.NES.retrooper")
     }
 }
+
+tasks.register("putIntoTestServer") {
+    dependsOn("shadowJar")
+    val testServer = file("${projectDir}/server/plugins").apply{ if (!exists()) mkdirs() }
+    doLast {
+        copy {
+            from("build/libs/NES-${project.version}.jar")
+            into(testServer)
+        }
+    }
+}

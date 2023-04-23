@@ -5,9 +5,7 @@
 package com.grapeshot.halfnes.ui;
 
 import com.grapeshot.halfnes.HeadlessNES;
-import com.grapeshot.halfnes.NES;
 import com.grapeshot.halfnes.PrefsSingleton;
-import jdk.javadoc.internal.doclets.formats.html.markup.Head;
 
 /**
  *
