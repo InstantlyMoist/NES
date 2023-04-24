@@ -1,6 +1,5 @@
 package me.kyllian.nes.commands;
 
-import com.grapeshot.halfnes.NES;
 import me.kyllian.nes.NESPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -29,6 +28,9 @@ public final class CommandManager {
         registerCommand(new NESCommand(plugin));
     }
 
+    public void reload() {
+        BaseCommand.helpComponent = null;
+    }
 
     public void registerCommand(@NotNull BaseCommand command) {
         this.commandMap.register(plugin.getName(), command);

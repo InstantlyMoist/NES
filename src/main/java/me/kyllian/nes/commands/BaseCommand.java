@@ -20,7 +20,7 @@ import java.util.Set;
 
 public abstract class BaseCommand extends BukkitCommand {
 
-    private static BaseComponent helpComponent = null;
+    static BaseComponent helpComponent = null;
 
     private final Set<BaseCommand> subCommands = new HashSet<>();
     protected final NESPlugin plugin;

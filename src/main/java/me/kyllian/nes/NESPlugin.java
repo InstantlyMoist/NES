@@ -68,6 +68,7 @@ public final class NESPlugin extends JavaPlugin {
         }));
         mapHandler.loadData();
         commandManager.registerDefaults();
+        commandManager.reload();
         packetListenerManager.setup();
     }
 
