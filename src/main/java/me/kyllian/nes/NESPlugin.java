@@ -1,14 +1,16 @@
 package me.kyllian.nes;
 
-import me.kyllian.nes.commands.NesExecutor;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.settings.PacketEventsSettings;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import me.kyllian.nes.commands.CommandManager;
 import me.kyllian.nes.data.Pocket;
 import me.kyllian.nes.handlers.MessageHandler;
 import me.kyllian.nes.handlers.PlayerHandler;
 import me.kyllian.nes.handlers.RomHandler;
 import me.kyllian.nes.handlers.map.MapHandler;
 import me.kyllian.nes.handlers.map.MapHandlerFactory;
-import me.kyllian.nes.listeners.*;
-import me.kyllian.nes.listeners.packets.SteerVehicleListener;
+import me.kyllian.nes.listeners.manager.PacketListenerManager;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,23 +18,34 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NESPlugin extends JavaPlugin {
+public final class NESPlugin extends JavaPlugin {
 
     private int gamesEmulated = 0;
-
-    private boolean protocolLib;
-
     private MapHandler mapHandler;
     private MessageHandler messageHandler;
     private PlayerHandler playerHandler;
     private RomHandler romHandler;
+    private PacketListenerManager packetListenerManager;
+    private CommandManager commandManager;
+
+
+    @Override
+    public void onLoad() {
+        PacketEventsSettings settings = new PacketEventsSettings()
+                .bStats(false)
+                .checkForUpdates(false);
+        PacketEvents.setAPI(
+                SpigotPacketEventsBuilder.build(
+                        this,
+                        settings
+                )
+        );
+    }
 
     @Override
     public void onEnable() {
         super.onEnable();
-
-        protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
-
+        PacketEvents.getAPI().init();
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
 
@@ -40,6 +53,8 @@ public class NESPlugin extends JavaPlugin {
         messageHandler = new MessageHandler(this);
         playerHandler = new PlayerHandler(this);
         romHandler = new RomHandler(this);
+        packetListenerManager = new PacketListenerManager(this);
+        commandManager = new CommandManager(this);
 
         Metrics metrics = new Metrics(this, 11908);
         metrics.addCustomChart(new Metrics.SingleLineChart("games_emulated", () ->
@@ -51,28 +66,14 @@ public class NESPlugin extends JavaPlugin {
             });
             return values;
         }));
-
-
         mapHandler.loadData();
-
-        getCommand("nes").setExecutor(new NesExecutor(this));
-
-        new InventoryClickListener(this);
-        new PlayerDropItemListener(this);
-        new PlayerInteractEntityListener(this);
-        new PlayerInteractListener(this);
-        new PlayerItemHeldListener(this);
-        if (!protocolLib) new PlayerMoveListener(this);
-        new PlayerQuitListener(this);
-        new PlayerSwapHandItemsListener(this);
-
-        if (protocolLib) new SteerVehicleListener(this);
+        commandManager.registerDefaults();
+        commandManager.reload();
+        packetListenerManager.setup();
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
-
         Bukkit.getOnlinePlayers().forEach(player -> {
             Pocket pocket = playerHandler.getPocket(player);
             if (!pocket.isEmpty()) pocket.stopEmulator(player);
@@ -99,7 +100,5 @@ public class NESPlugin extends JavaPlugin {
         gamesEmulated++;
     }
 
-    public boolean isProtocolLib() {
-        return protocolLib;
-    }
+
 }

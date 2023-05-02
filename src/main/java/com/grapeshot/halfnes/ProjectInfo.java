@@ -1,4 +1,4 @@
-package main.java.com.grapeshot.halfnes;
+package com.grapeshot.halfnes;
 
 /**
  * Specifies the version and url as defined in the POM

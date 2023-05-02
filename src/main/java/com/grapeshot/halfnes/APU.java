@@ -4,9 +4,7 @@
  */
 package com.grapeshot.halfnes;
 
-import com.grapeshot.halfnes.ui.Oscilloscope;
 import com.grapeshot.halfnes.mappers.Mapper;
-import java.util.ArrayList;
 
 public class APU {
 

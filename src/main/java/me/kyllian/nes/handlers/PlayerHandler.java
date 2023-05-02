@@ -25,14 +25,14 @@ public class PlayerHandler {
             plugin.notifyEmulate();
             getPocket(player).loadEmulator(plugin, player, path);
             plugin.getMapHandler().sendMap(player);
-            if (plugin.isProtocolLib()) return;
-            Location playerLocation = player.getLocation();
-            playerLocation.setYaw(0);
-            playerLocation.setPitch(40);
-            playerLocation.setX(playerLocation.getBlockX() + 0.5);
-            playerLocation.setY(playerLocation.getBlockY());
-            playerLocation.setZ(playerLocation.getBlockZ() + 0.5);
-            player.teleport(playerLocation);
+//            if (plugin.isProtocolLib()) return;
+//            Location playerLocation = player.getLocation();
+//            playerLocation.setYaw(0);
+//            playerLocation.setPitch(40);
+//            playerLocation.setX(playerLocation.getBlockX() + 0.5);
+//            playerLocation.setY(playerLocation.getBlockY());
+//            playerLocation.setZ(playerLocation.getBlockZ() + 0.5);
+//            player.teleport(playerLocation);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
